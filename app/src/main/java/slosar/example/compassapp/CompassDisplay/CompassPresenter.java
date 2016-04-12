@@ -10,4 +10,14 @@ class CompassPresenter implements ICompassPresenter {
     public CompassPresenter(ICompassView view) {
         this.view = view;
     }
+
+    @Override
+    public void setNewLatitude(double latitude) {
+
+    }
+
+    @Override
+    public void setNewLongitude(double longitude) {
+
+    }
 }
