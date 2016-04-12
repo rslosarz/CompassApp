@@ -1,5 +1,10 @@
 package slosar.example.compassapp.CompassDisplay;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import slosar.example.compassapp.DataModels.NorthAngleModel;
+
 /**
  * Created by Rafal on 2016-04-12.
  */
@@ -9,15 +14,17 @@ class CompassPresenter implements ICompassPresenter {
 
     public CompassPresenter(ICompassView view) {
         this.view = view;
+
+        EventBus.getDefault().register(this);
     }
 
     @Override
-    public void setNewLatitude(double latitude) {
+    public void setNewCoordinates(float latitude, float longitude) {
 
     }
 
-    @Override
-    public void setNewLongitude(double longitude) {
-
+    @Subscribe
+    public void onNewCompassData(NorthAngleModel northAngleModel) {
+        view.setCompassAngle(northAngleModel.getCompassNorthAngleOld(), northAngleModel.getCompassNorthAngleNew());
     }
 }

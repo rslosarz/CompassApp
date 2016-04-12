@@ -11,20 +11,23 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import slosar.example.compassapp.DataProcessing.CompassDataProvider;
+import slosar.example.compassapp.DataProcessing.ICompassDataProvider;
 import slosar.example.compassapp.Exceptions.WrongCoordinatesException;
 import slosar.example.compassapp.R;
 
 public class CompassActivity extends AppCompatActivity implements ICompassView {
 
     @Bind(R.id.iv_compass)
-    ImageView mIvCompass;
+    private ImageView mIvCompass;
     @Bind(R.id.iv_direction)
-    ImageView mIvDirection;
+    private ImageView mIvDirection;
     @Bind(R.id.et_latitude)
-    EditText mEtLatitude;
+    private EditText mEtLatitude;
     @Bind(R.id.et_longitude)
-    EditText mEtLongitude;
+    private EditText mEtLongitude;
 
+    private ICompassDataProvider dataProvider;
     private ICompassPresenter presenter;
 
     @Override
@@ -33,14 +36,22 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         setContentView(R.layout.activity_compass);
         ButterKnife.bind(this);
 
+        dataProvider = new CompassDataProvider(this);
         presenter = new CompassPresenter(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dataProvider.dismiss();
     }
 
     @OnClick(R.id.bt_latitude)
     public void setNewLatitude() {
         try {
-            double latitude = getCoordinate(mEtLatitude);
-            presenter.setNewLatitude(latitude);
+            float latitude = getCoordinate(mEtLatitude);
+            float longitude = getCoordinate(mEtLongitude);
+            presenter.setNewCoordinates(latitude, longitude);
         } catch (WrongCoordinatesException e) {
             handleException(e);
         }
@@ -49,42 +60,43 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     @OnClick(R.id.bt_longitude)
     public void setNewLongitude() {
         try {
-            double longitude = getCoordinate(mEtLongitude);
-            presenter.setNewLongitude(longitude);
+            float latitude = getCoordinate(mEtLatitude);
+            float longitude = getCoordinate(mEtLongitude);
+            presenter.setNewCoordinates(latitude, longitude);
         } catch (WrongCoordinatesException e) {
             handleException(e);
         }
     }
 
     @Override
-    public void setCompassAngle(double currentAngle, double newAngle) {
+    public void setCompassAngle(float currentAngle, float newAngle) {
         mIvCompass.startAnimation(getRotationObject(currentAngle, newAngle));
     }
 
     @Override
-    public void setDirectionAngle(double currentAngle, double newAngle) {
+    public void setDirectionAngle(float currentAngle, float newAngle) {
         mIvDirection.startAnimation(getRotationObject(currentAngle, newAngle));
     }
 
-    private RotateAnimation getRotationObject(double beginAngle, double endAngle) {
+    private RotateAnimation getRotationObject(float beginAngle, float endAngle) {
         RotateAnimation rotateAnimation = new RotateAnimation(
-                -(float) beginAngle,
-                -(float) endAngle,
+                -beginAngle,
+                -endAngle,
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF,
                 0.5f);
-        rotateAnimation.setDuration(210);
+        rotateAnimation.setDuration(100);
         rotateAnimation.setFillAfter(true);
 
         return rotateAnimation;
     }
 
-    private double getCoordinate(EditText editText) throws WrongCoordinatesException {
+    private float getCoordinate(EditText editText) throws WrongCoordinatesException {
         String text = editText.getText().toString();
         if (text.isEmpty())
             throw new WrongCoordinatesException(getResources().getString(R.string.empty_coordinate_exception));
         try {
-            return Double.parseDouble(mEtLongitude.getText().toString());
+            return Float.parseFloat(mEtLongitude.getText().toString());
         } catch (NumberFormatException e) {
             throw new WrongCoordinatesException(getResources().getString(R.string.wrong_coordinate_exception));
         }
