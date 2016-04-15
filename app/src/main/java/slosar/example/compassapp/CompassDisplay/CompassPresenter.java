@@ -1,30 +1,35 @@
 package slosar.example.compassapp.CompassDisplay;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import android.content.Context;
 
-import slosar.example.compassapp.DataModels.NorthAngleModel;
+import slosar.example.compassapp.DataProcessing.CompassDataManager;
+import slosar.example.compassapp.DataProcessing.ICompassDataManager;
 
 /**
  * Created by Rafal on 2016-04-12.
  */
-class CompassPresenter implements ICompassPresenter {
+class CompassPresenter implements ICompassPresenter, ICompassDataConsumer {
 
     private final ICompassView view;
+    private final ICompassDataManager mDataProvider;
 
-    public CompassPresenter(ICompassView view) {
+    public CompassPresenter(Context context, ICompassView view) {
         this.view = view;
-
-        EventBus.getDefault().register(this);
+        mDataProvider = new CompassDataManager(context, this);
     }
 
     @Override
-    public void setNewCoordinates(float latitude, float longitude) {
-
+    public void setNewDirectionCoordinates(float latitude, float longitude) {
+        mDataProvider.setNewDirectionCoordinates(latitude, longitude);
     }
 
-    @Subscribe
-    public void onNewCompassData(NorthAngleModel northAngleModel) {
-        view.setCompassAngle(northAngleModel.getCompassNorthAngleOld(), northAngleModel.getCompassNorthAngleNew());
+    @Override
+    public void onNewNorthData(float northAngleOld, float northAngleNew) {
+        view.showCompassAngle(northAngleOld, northAngleNew);
+    }
+
+    @Override
+    public void onNewDirectionData(float directionAngleOld, float directionAngleNew) {
+        view.showDirectionAngle(directionAngleOld, directionAngleNew);
     }
 }

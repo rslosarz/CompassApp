@@ -8,27 +8,28 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import slosar.example.compassapp.DataProcessing.CompassDataProvider;
-import slosar.example.compassapp.DataProcessing.ICompassDataProvider;
+import slosar.example.compassapp.Events.MainActivityStateChanged;
 import slosar.example.compassapp.Exceptions.WrongCoordinatesException;
 import slosar.example.compassapp.R;
 
 public class CompassActivity extends AppCompatActivity implements ICompassView {
 
     @Bind(R.id.iv_compass)
-    private ImageView mIvCompass;
+    ImageView mIvCompass;
     @Bind(R.id.iv_direction)
-    private ImageView mIvDirection;
+    ImageView mIvDirection;
     @Bind(R.id.et_latitude)
-    private EditText mEtLatitude;
+    EditText mEtLatitude;
     @Bind(R.id.et_longitude)
-    private EditText mEtLongitude;
+    EditText mEtLongitude;
 
-    private ICompassDataProvider dataProvider;
-    private ICompassPresenter presenter;
+    private ICompassPresenter mPresenter;
+    private float mActualDirectionAngle = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +37,31 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         setContentView(R.layout.activity_compass);
         ButterKnife.bind(this);
 
-        dataProvider = new CompassDataProvider(this);
-        presenter = new CompassPresenter(this);
+        mPresenter = new CompassPresenter(this, this);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        dataProvider.dismiss();
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getStart()));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getResume()));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getPause()));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getStop()));
     }
 
     @OnClick(R.id.bt_latitude)
@@ -51,7 +69,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         try {
             float latitude = getCoordinate(mEtLatitude);
             float longitude = getCoordinate(mEtLongitude);
-            presenter.setNewCoordinates(latitude, longitude);
+            mPresenter.setNewDirectionCoordinates(latitude, longitude);
         } catch (WrongCoordinatesException e) {
             handleException(e);
         }
@@ -62,20 +80,22 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         try {
             float latitude = getCoordinate(mEtLatitude);
             float longitude = getCoordinate(mEtLongitude);
-            presenter.setNewCoordinates(latitude, longitude);
+            mPresenter.setNewDirectionCoordinates(latitude, longitude);
         } catch (WrongCoordinatesException e) {
             handleException(e);
         }
     }
 
     @Override
-    public void setCompassAngle(float currentAngle, float newAngle) {
+    public void showCompassAngle(float currentAngle, float newAngle) {
         mIvCompass.startAnimation(getRotationObject(currentAngle, newAngle));
+        mIvDirection.startAnimation(getRotationObject(currentAngle + mActualDirectionAngle, newAngle + mActualDirectionAngle));
     }
 
     @Override
-    public void setDirectionAngle(float currentAngle, float newAngle) {
+    public void showDirectionAngle(float currentAngle, float newAngle) {
         mIvDirection.startAnimation(getRotationObject(currentAngle, newAngle));
+        mActualDirectionAngle = newAngle;
     }
 
     private RotateAnimation getRotationObject(float beginAngle, float endAngle) {
@@ -85,7 +105,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF,
                 0.5f);
-        rotateAnimation.setDuration(100);
+        rotateAnimation.setDuration(200);
         rotateAnimation.setFillAfter(true);
 
         return rotateAnimation;

@@ -12,10 +12,11 @@ import rx.Subscriber;
 /**
  * Created by Rafal on 2016-04-12.
  */
-class NorthAngleProvider {
+class NorthAngleProvider implements IActivityStateSensitive {
 
+    private ICompassDataManager mDataProvider;
     private SensorManager mSensorManager;
-    private ICompassDataProvider mDataProvider;
+
     private float mNorthAngle;
     private final Subscriber northAngleSubscriber = new Subscriber<Float>() {
         @Override
@@ -35,14 +36,6 @@ class NorthAngleProvider {
         }
     };
     private float[] mAccAxisValues;
-    private float[] mMagAxisValues;
-    private final Observable northAngleCalculationObservable = Observable.create(new Observable.OnSubscribe<Subscriber>() {
-        @Override
-        public void call(Subscriber subscriber) {
-            subscriber.onNext(northAngleCalculation(mAccAxisValues, mMagAxisValues));
-            subscriber.onCompleted();
-        }
-    });
     private final SensorEventListener mAccelerometerListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -56,6 +49,14 @@ class NorthAngleProvider {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
     };
+    private float[] mMagAxisValues;
+    private final Observable northAngleCalculationObservable = Observable.create(new Observable.OnSubscribe<Subscriber>() {
+        @Override
+        public void call(Subscriber subscriber) {
+            subscriber.onNext(northAngleCalculation(mAccAxisValues, mMagAxisValues));
+            subscriber.onCompleted();
+        }
+    });
     private final SensorEventListener mMagnetometerListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -71,11 +72,9 @@ class NorthAngleProvider {
     };
 
 
-    public NorthAngleProvider(Context context, ICompassDataProvider dataProvider) {
+    public NorthAngleProvider(Context context, ICompassDataManager dataProvider) {
         mDataProvider = dataProvider;
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        mSensorManager.registerListener(mAccelerometerListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(mMagnetometerListener, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
     }
 
     private void runNorthAngleCalculations() {
@@ -98,11 +97,11 @@ class NorthAngleProvider {
     }
 
     private float getFilteredValue(float oldValue, float newValue) {
-        float bias = 0.4f;
-        float diff = oldValue - newValue;
+        float bias = 0.1f;
+        float diff = newValue - oldValue;
         diff = ensureDegreeFormat(diff);
-        newValue += bias * diff;
-        return ensureDegreeFormat(newValue);
+        oldValue += bias * diff;
+        return ensureDegreeFormat(oldValue);
     }
 
     private float ensureDegreeFormat(float angle) {
@@ -111,8 +110,25 @@ class NorthAngleProvider {
         return angle;
     }
 
-    public void dismiss() {
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void resume() {
+        mSensorManager.registerListener(mAccelerometerListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(mMagnetometerListener, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    public void pause() {
         mSensorManager.unregisterListener(mAccelerometerListener);
         mSensorManager.unregisterListener(mMagnetometerListener);
+    }
+
+    @Override
+    public void stop() {
+
     }
 }
