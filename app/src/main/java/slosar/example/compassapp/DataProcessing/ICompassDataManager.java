@@ -8,5 +8,5 @@ public interface ICompassDataManager {
 
     void setDirectionAngle(float destinationAngleOld, float destinationAngleNew);
 
-    void setNewDirectionCoordinates(float latitude, float longitude);
+    void setUserLocation(float latitude, float longitude);
 }

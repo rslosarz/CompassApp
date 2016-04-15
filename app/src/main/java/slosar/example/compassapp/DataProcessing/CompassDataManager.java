@@ -6,7 +6,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import slosar.example.compassapp.CompassDisplay.ICompassDataConsumer;
+import slosar.example.compassapp.DestinationInput.UserLocationChanged;
 import slosar.example.compassapp.Events.MainActivityStateChanged;
+import slosar.example.compassapp.Events.TargetLocationChanged;
 
 /**
  * Created by Rafal on 2016-04-12.
@@ -36,8 +38,8 @@ public class CompassDataManager implements ICompassDataManager {
     }
 
     @Override
-    public void setNewDirectionCoordinates(float latitude, float longitude) {
-        mDirectionAngleProvider.setNewCoordinates(latitude, longitude);
+    public void setUserLocation(float latitude, float longitude) {
+        EventBus.getDefault().postSticky(new UserLocationChanged(latitude, longitude));
     }
 
     @Subscribe
@@ -55,5 +57,10 @@ public class CompassDataManager implements ICompassDataManager {
             mNorthAngleProvider.stop();
             mDirectionAngleProvider.stop();
         }
+    }
+
+    @Subscribe
+    public void onTargetLocationChanged(TargetLocationChanged targetLocationChanged) {
+        mDirectionAngleProvider.setNewCoordinates(targetLocationChanged.mTargetLocation);
     }
 }

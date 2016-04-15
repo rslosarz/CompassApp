@@ -36,6 +36,14 @@ class NorthAngleProvider implements IActivityStateSensitive {
         }
     };
     private float[] mAccAxisValues;
+    private float[] mMagAxisValues;
+    private final Observable northAngleCalculationObservable = Observable.create(new Observable.OnSubscribe<Subscriber>() {
+        @Override
+        public void call(Subscriber subscriber) {
+            subscriber.onNext(northAngleCalculation(mAccAxisValues, mMagAxisValues));
+            subscriber.onCompleted();
+        }
+    });
     private final SensorEventListener mAccelerometerListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -49,14 +57,6 @@ class NorthAngleProvider implements IActivityStateSensitive {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
     };
-    private float[] mMagAxisValues;
-    private final Observable northAngleCalculationObservable = Observable.create(new Observable.OnSubscribe<Subscriber>() {
-        @Override
-        public void call(Subscriber subscriber) {
-            subscriber.onNext(northAngleCalculation(mAccAxisValues, mMagAxisValues));
-            subscriber.onCompleted();
-        }
-    });
     private final SensorEventListener mMagnetometerListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
@@ -97,7 +97,7 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     private float getFilteredValue(float oldValue, float newValue) {
-        float bias = 0.1f;
+        float bias = 0.7f;
         float diff = newValue - oldValue;
         diff = ensureDegreeFormat(diff);
         oldValue += bias * diff;

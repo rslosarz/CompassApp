@@ -4,8 +4,10 @@ import android.content.Context;
 import android.location.Location;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import slosar.example.compassapp.GoogleApi.GoogleApiManager;
+import slosar.example.compassapp.GoogleApi.IGoogleApiManager;
 
 /**
  * Created by Rafal on 2016-04-12.
@@ -13,16 +15,17 @@ import slosar.example.compassapp.GoogleApi.GoogleApiManager;
 class DirectionAngleProvider implements IActivityStateSensitive {
 
     private ICompassDataManager mDataProvider;
-    private GoogleApiManager mGoogleApiManager;
+    private IGoogleApiManager mGoogleApiManager;
 
     private float mDirectionAngle;
     private Location mDestinationLocation;
     private Location mCurrentLocation;
 
-    LocationListener mLocationListener = new LocationListener() {
+    private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             mCurrentLocation = location;
+            mDataProvider.setUserLocation((float) mCurrentLocation.getLatitude(), (float) mCurrentLocation.getLongitude());
             calculateBearing();
         }
     };
@@ -31,10 +34,6 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         mDataProvider = dataProvider;
         mGoogleApiManager = new GoogleApiManager(context);
         mGoogleApiManager.registerLocationListener(mLocationListener);
-
-        mDestinationLocation = new Location("");
-        mDestinationLocation.setLatitude(52.4320811d);
-        mDestinationLocation.setLongitude(16.5429719d);
     }
 
     private void calculateBearing() {
@@ -47,10 +46,13 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         }
     }
 
-    public void setNewCoordinates(float latitude, float longitude) {
+    public void setNewCoordinates(LatLng targetLocation) {
+        if (mDestinationLocation == null) {
+            mGoogleApiManager.resume();
+        }
         mDestinationLocation = new Location("");
-        mDestinationLocation.setLatitude(latitude);
-        mDestinationLocation.setLongitude(longitude);
+        mDestinationLocation.setLatitude(targetLocation.latitude);
+        mDestinationLocation.setLongitude(targetLocation.longitude);
     }
 
     private float getFilteredValue(float oldValue, float newValue) {
@@ -74,7 +76,9 @@ class DirectionAngleProvider implements IActivityStateSensitive {
 
     @Override
     public void resume() {
-        mGoogleApiManager.resume();
+        if (mDestinationLocation != null) {
+            mGoogleApiManager.resume();
+        }
     }
 
     @Override

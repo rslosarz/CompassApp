@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">CompassApp</string>
-    <string name="latitude">Set latitude</string>
-    <string name="longitude">Set longitud</string>
-    <string name="latitude_input">Latitude</string>
-    <string name="longitude_input">Longitude</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
     <string name="empty_coordinate_exception">Input field can not be empty!</string>
     <string name="wrong_coordinate_exception">Invailid input value!</string>
+    <string name="title_activity_location_input">Map</string>
+    <string name="set_coordinates">Set target location</string>
 </resources>

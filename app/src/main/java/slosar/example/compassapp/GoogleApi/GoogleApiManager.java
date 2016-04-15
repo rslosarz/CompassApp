@@ -16,20 +16,15 @@ import com.google.android.gms.location.LocationServices;
 public class GoogleApiManager implements IGoogleApiManager {
 
     // Location updates intervals in sec
-    private static int UPDATE_INTERVAL = 1000; // 1 sec
-    private static int FATEST_INTERVAL = 500; // 0.5 sec
+    private static int UPDATE_INTERVAL = 200; // 0.2 sec
+    private static int FATEST_INTERVAL = 100; // 0.1 sec
     private static int DISPLACEMENT = 0; // 0 meters
-    Context mContext;
-    GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
 
-        }
-    };
+    private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private LocationListener mLocationListener;
-    GoogleApiClient.ConnectionCallbacks mConnectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
+    private GoogleApiClient.ConnectionCallbacks mConnectionCallbacks = new GoogleApiClient.ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
             startLocationUpdates();
@@ -38,6 +33,12 @@ public class GoogleApiManager implements IGoogleApiManager {
         @Override
         public void onConnectionSuspended(int i) {
             start();
+        }
+    };
+    private GoogleApiClient.OnConnectionFailedListener mOnConnectionFailedListener = new GoogleApiClient.OnConnectionFailedListener() {
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+
         }
     };
 
@@ -87,21 +88,7 @@ public class GoogleApiManager implements IGoogleApiManager {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(mContext);
 
-        if (resultCode != ConnectionResult.SUCCESS) {
-            /*
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, mContext,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(getApplicationContext(),
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-                finish();
-
-            }*/
-            return false;
-        } else
-            return true;
+        return resultCode == ConnectionResult.SUCCESS;
     }
 
     private GoogleApiClient buildGoogleApiClient() {

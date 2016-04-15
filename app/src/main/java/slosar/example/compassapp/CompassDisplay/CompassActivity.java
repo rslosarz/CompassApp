@@ -1,10 +1,10 @@
 package slosar.example.compassapp.CompassDisplay;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -13,6 +13,7 @@ import org.greenrobot.eventbus.EventBus;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import slosar.example.compassapp.DestinationInput.LocationInputActivity;
 import slosar.example.compassapp.Events.MainActivityStateChanged;
 import slosar.example.compassapp.Exceptions.WrongCoordinatesException;
 import slosar.example.compassapp.R;
@@ -23,12 +24,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     ImageView mIvCompass;
     @Bind(R.id.iv_direction)
     ImageView mIvDirection;
-    @Bind(R.id.et_latitude)
-    EditText mEtLatitude;
-    @Bind(R.id.et_longitude)
-    EditText mEtLongitude;
 
-    private ICompassPresenter mPresenter;
     private float mActualDirectionAngle = 0;
 
     @Override
@@ -37,7 +33,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         setContentView(R.layout.activity_compass);
         ButterKnife.bind(this);
 
-        mPresenter = new CompassPresenter(this, this);
+        new CompassPresenter(this, this);
     }
 
     @Override
@@ -64,26 +60,10 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getStop()));
     }
 
-    @OnClick(R.id.bt_latitude)
+    @OnClick(R.id.bt_set_coordinate)
     public void setNewLatitude() {
-        try {
-            float latitude = getCoordinate(mEtLatitude);
-            float longitude = getCoordinate(mEtLongitude);
-            mPresenter.setNewDirectionCoordinates(latitude, longitude);
-        } catch (WrongCoordinatesException e) {
-            handleException(e);
-        }
-    }
-
-    @OnClick(R.id.bt_longitude)
-    public void setNewLongitude() {
-        try {
-            float latitude = getCoordinate(mEtLatitude);
-            float longitude = getCoordinate(mEtLongitude);
-            mPresenter.setNewDirectionCoordinates(latitude, longitude);
-        } catch (WrongCoordinatesException e) {
-            handleException(e);
-        }
+        Intent intent = new Intent(this, LocationInputActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -109,17 +89,6 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         rotateAnimation.setFillAfter(true);
 
         return rotateAnimation;
-    }
-
-    private float getCoordinate(EditText editText) throws WrongCoordinatesException {
-        String text = editText.getText().toString();
-        if (text.isEmpty())
-            throw new WrongCoordinatesException(getResources().getString(R.string.empty_coordinate_exception));
-        try {
-            return Float.parseFloat(mEtLongitude.getText().toString());
-        } catch (NumberFormatException e) {
-            throw new WrongCoordinatesException(getResources().getString(R.string.wrong_coordinate_exception));
-        }
     }
 
     private void handleException(Exception e) {

@@ -3,24 +3,17 @@ package slosar.example.compassapp.CompassDisplay;
 import android.content.Context;
 
 import slosar.example.compassapp.DataProcessing.CompassDataManager;
-import slosar.example.compassapp.DataProcessing.ICompassDataManager;
 
 /**
  * Created by Rafal on 2016-04-12.
  */
-class CompassPresenter implements ICompassPresenter, ICompassDataConsumer {
+class CompassPresenter implements ICompassDataConsumer {
 
     private final ICompassView view;
-    private final ICompassDataManager mDataProvider;
 
     public CompassPresenter(Context context, ICompassView view) {
         this.view = view;
-        mDataProvider = new CompassDataManager(context, this);
-    }
-
-    @Override
-    public void setNewDirectionCoordinates(float latitude, float longitude) {
-        mDataProvider.setNewDirectionCoordinates(latitude, longitude);
+        new CompassDataManager(context, this);
     }
 
     @Override
