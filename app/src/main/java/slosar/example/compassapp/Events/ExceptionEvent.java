@@ -6,6 +6,7 @@ package slosar.example.compassapp.Events;
 public class ExceptionEvent {
     public Exception e;
 
+
     public ExceptionEvent(Exception e) {
         this.e = e;
     }

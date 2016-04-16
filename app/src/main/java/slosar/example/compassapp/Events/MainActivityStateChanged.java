@@ -6,6 +6,7 @@ package slosar.example.compassapp.Events;
 public class MainActivityStateChanged {
     private final int mState;
 
+
     public MainActivityStateChanged(int state) {
         mState = state;
     }

@@ -20,7 +20,6 @@ class NorthAngleProvider implements IActivityStateSensitive {
 
     private ICompassDataManager mDataProvider;
     private SensorManager mSensorManager;
-
     private float mNorthAngle;
     private final Subscriber northAngleSubscriber = new Subscriber<Float>() {
         @Override

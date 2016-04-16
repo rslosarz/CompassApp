@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class TargetLocationChanged {
     public final LatLng mTargetLocation;
 
+
     public TargetLocationChanged(LatLng targetLocation) {
         mTargetLocation = targetLocation;
     }

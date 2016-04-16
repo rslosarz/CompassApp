@@ -30,6 +30,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         }
     };
 
+
     public DirectionAngleProvider(Context context, ICompassDataManager dataProvider) {
         mDataProvider = dataProvider;
         mGoogleApiManager = new GoogleApiManager(context);

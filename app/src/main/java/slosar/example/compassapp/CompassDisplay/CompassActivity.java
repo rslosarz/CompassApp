@@ -1,7 +1,11 @@
 package slosar.example.compassapp.CompassDisplay;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
@@ -19,6 +23,7 @@ import slosar.example.compassapp.Events.ExceptionEvent;
 import slosar.example.compassapp.Events.MainActivityStateChanged;
 import slosar.example.compassapp.Exceptions.GooglePlayNotAvailableException;
 import slosar.example.compassapp.Exceptions.NorthAngleCalculationException;
+import slosar.example.compassapp.Exceptions.UserLocationUnavailableException;
 import slosar.example.compassapp.R;
 
 public class CompassActivity extends AppCompatActivity implements ICompassView {
@@ -30,11 +35,14 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
 
     private float mActualDirectionAngle = 0;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
         ButterKnife.bind(this);
+
+        checkSystemServices();
 
         EventBus.getDefault().register(this);
         new CompassPresenter(this, this);
@@ -82,6 +90,44 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         mActualDirectionAngle = -newAngle;
     }
 
+    private void checkSystemServices() {
+        if (!gpsLocationEnabled()) {
+            showGpsSettingsDialog();
+        }
+    }
+
+    private boolean gpsLocationEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean gps, network;
+
+        gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        return gps || network;
+    }
+
+    private void showGpsSettingsDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        alertDialog.setTitle(getResources().getString(R.string.gps_dialog_title));
+        alertDialog.setMessage(getResources().getString(R.string.gps_dialog_message));
+
+        alertDialog.setPositiveButton(getResources().getString(R.string.yes_text), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+
+        alertDialog.setNegativeButton(getResources().getString(R.string.no_text), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog.show();
+    }
+
     private RotateAnimation getRotationObject(float beginAngle, float endAngle) {
         RotateAnimation rotateAnimation = new RotateAnimation(
                 -beginAngle,
@@ -105,6 +151,8 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         } else if (e instanceof GooglePlayNotAvailableException) {
             Toast.makeText(this, getResources().getString(R.string.google_api_not_available), Toast.LENGTH_SHORT).show();
+        } else if (e instanceof UserLocationUnavailableException) {
+            Toast.makeText(this, getResources().getString(R.string.user_location_unavailable_exception), Toast.LENGTH_SHORT).show();
         }
     }
 }

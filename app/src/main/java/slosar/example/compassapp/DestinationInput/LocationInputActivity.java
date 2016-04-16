@@ -18,7 +18,9 @@ import org.greenrobot.eventbus.Subscribe;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import slosar.example.compassapp.Events.ExceptionEvent;
 import slosar.example.compassapp.Events.TargetLocationChanged;
+import slosar.example.compassapp.Exceptions.UserLocationUnavailableException;
 import slosar.example.compassapp.R;
 
 public class LocationInputActivity extends FragmentActivity {
@@ -38,7 +40,6 @@ public class LocationInputActivity extends FragmentActivity {
             onMapClickHandler(latLng);
         }
     };
-
     private OnMapReadyCallback mOnMapReadyCallback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
@@ -49,19 +50,27 @@ public class LocationInputActivity extends FragmentActivity {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
         ButterKnife.bind(this);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(mOnMapReadyCallback);
-
         EventBus.getDefault().register(this);
-        UserLocationChanged userLocationChanged = EventBus.getDefault().getStickyEvent(UserLocationChanged.class);
-        mUserLatLng = userLocationChanged.getPosition();
+        try {
+            UserLocationChanged userLocationChanged = EventBus.getDefault().getStickyEvent(UserLocationChanged.class);
+            mUserLatLng = userLocationChanged.getPosition();
+
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(mOnMapReadyCallback);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            EventBus.getDefault().postSticky(new ExceptionEvent(new UserLocationUnavailableException()));
+            finish();
+        }
     }
 
     @OnClick(R.id.bt_set_coordinate)

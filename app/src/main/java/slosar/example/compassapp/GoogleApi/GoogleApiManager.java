@@ -20,7 +20,6 @@ import slosar.example.compassapp.Exceptions.GooglePlayNotAvailableException;
  */
 public class GoogleApiManager implements IGoogleApiManager {
 
-    // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 100; // 0.1 sec
     private static int FATEST_INTERVAL = 100; // 0.1 sec
     private static int DISPLACEMENT = 0; // 0 meters
@@ -46,6 +45,7 @@ public class GoogleApiManager implements IGoogleApiManager {
 
         }
     };
+
 
     public GoogleApiManager(Context context) {
         mContext = context;

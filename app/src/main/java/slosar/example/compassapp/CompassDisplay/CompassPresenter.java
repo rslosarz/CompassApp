@@ -11,6 +11,7 @@ class CompassPresenter implements ICompassDataConsumer {
 
     private final ICompassView view;
 
+
     public CompassPresenter(Context context, ICompassView view) {
         this.view = view;
         new CompassDataManager(context, this);

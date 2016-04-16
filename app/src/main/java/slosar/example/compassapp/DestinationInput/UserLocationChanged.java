@@ -8,6 +8,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class UserLocationChanged {
     private final float mLatitude, mLongitude;
 
+
     public UserLocationChanged(float latitude, float longitude) {
         mLatitude = latitude;
         mLongitude = longitude;

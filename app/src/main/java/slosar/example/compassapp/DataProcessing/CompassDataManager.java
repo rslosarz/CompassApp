@@ -19,6 +19,7 @@ public class CompassDataManager implements ICompassDataManager {
     private NorthAngleProvider mNorthAngleProvider;
     private DirectionAngleProvider mDirectionAngleProvider;
 
+
     public CompassDataManager(Context context, ICompassDataConsumer compassDataConsumer) {
         mCompassDataConsumer = compassDataConsumer;
         mNorthAngleProvider = new NorthAngleProvider(context, this);

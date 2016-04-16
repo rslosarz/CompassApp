@@ -7,4 +7,9 @@
     <string name="title_activity_location_input">Map</string>
     <string name="set_coordinates">Set target location</string>
     <string name="google_api_not_available">GoogleApi jest nieosiągalne!</string>
+    <string name="user_location_unavailable_exception">User location is unavailable</string>
+    <string name="gps_dialog_title">GPS error</string>
+    <string name="gps_dialog_message">GPS is not enabled. Do you want to go to settings menu?</string>
+    <string name="yes_text">yes</string>
+    <string name="no_text">no</string>
 </resources>
