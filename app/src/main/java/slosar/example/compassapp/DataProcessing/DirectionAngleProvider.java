@@ -56,7 +56,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     private float getFilteredValue(float oldValue, float newValue) {
-        float bias = 0.3f;
+        float bias = 0.8f;
         float diff = newValue - oldValue;
         diff = ensureDegreeFormat(diff);
         oldValue += bias * diff;

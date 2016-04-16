@@ -6,4 +6,5 @@
     <string name="wrong_coordinate_exception">Invailid input value!</string>
     <string name="title_activity_location_input">Map</string>
     <string name="set_coordinates">Set target location</string>
+    <string name="google_api_not_available">GoogleApi jest nieosiągalne!</string>
 </resources>

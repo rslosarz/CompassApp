@@ -9,13 +9,16 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import slosar.example.compassapp.DestinationInput.LocationInputActivity;
+import slosar.example.compassapp.Events.ExceptionEvent;
 import slosar.example.compassapp.Events.MainActivityStateChanged;
-import slosar.example.compassapp.Exceptions.WrongCoordinatesException;
+import slosar.example.compassapp.Exceptions.GooglePlayNotAvailableException;
+import slosar.example.compassapp.Exceptions.NorthAngleCalculationException;
 import slosar.example.compassapp.R;
 
 public class CompassActivity extends AppCompatActivity implements ICompassView {
@@ -33,6 +36,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         setContentView(R.layout.activity_compass);
         ButterKnife.bind(this);
 
+        EventBus.getDefault().register(this);
         new CompassPresenter(this, this);
     }
 
@@ -74,8 +78,8 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
 
     @Override
     public void showDirectionAngle(float currentAngle, float newAngle) {
-        mIvDirection.startAnimation(getRotationObject(currentAngle, newAngle));
-        mActualDirectionAngle = newAngle;
+        mIvDirection.startAnimation(getRotationObject(-currentAngle, -newAngle));
+        mActualDirectionAngle = -newAngle;
     }
 
     private RotateAnimation getRotationObject(float beginAngle, float endAngle) {
@@ -91,9 +95,16 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         return rotateAnimation;
     }
 
+    @Subscribe
+    public void onExceptionOccured(ExceptionEvent exceptionEvent) {
+        handleException(exceptionEvent.e);
+    }
+
     private void handleException(Exception e) {
-        if (e instanceof WrongCoordinatesException) {
+        if (e instanceof NorthAngleCalculationException) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        } else if (e instanceof GooglePlayNotAvailableException) {
+            Toast.makeText(this, getResources().getString(R.string.google_api_not_available), Toast.LENGTH_SHORT).show();
         }
     }
 }

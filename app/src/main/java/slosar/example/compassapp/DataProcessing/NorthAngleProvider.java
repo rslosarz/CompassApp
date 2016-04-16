@@ -6,8 +6,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import org.greenrobot.eventbus.EventBus;
+
 import rx.Observable;
 import rx.Subscriber;
+import slosar.example.compassapp.Events.ExceptionEvent;
+import slosar.example.compassapp.Exceptions.NorthAngleCalculationException;
 
 /**
  * Created by Rafal on 2016-04-12.
@@ -26,7 +30,12 @@ class NorthAngleProvider implements IActivityStateSensitive {
 
         @Override
         public void onError(Throwable e) {
-
+            try {
+                throw new NorthAngleCalculationException(e.getMessage());
+            } catch (NorthAngleCalculationException ex) {
+                ex.printStackTrace();
+                EventBus.getDefault().postSticky(new ExceptionEvent(ex));
+            }
         }
 
         @Override
@@ -40,7 +49,12 @@ class NorthAngleProvider implements IActivityStateSensitive {
     private final Observable northAngleCalculationObservable = Observable.create(new Observable.OnSubscribe<Subscriber>() {
         @Override
         public void call(Subscriber subscriber) {
-            subscriber.onNext(northAngleCalculation(mAccAxisValues, mMagAxisValues));
+            try {
+                subscriber.onNext(northAngleCalculation(mAccAxisValues, mMagAxisValues));
+            } catch (NorthAngleCalculationException e) {
+                e.printStackTrace();
+                EventBus.getDefault().postSticky(new ExceptionEvent(e));
+            }
             subscriber.onCompleted();
         }
     });
@@ -49,7 +63,8 @@ class NorthAngleProvider implements IActivityStateSensitive {
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                 mAccAxisValues = event.values.clone();
-                runNorthAngleCalculations();
+                if (mMagAxisValues != null)
+                    runNorthAngleCalculations();
             }
         }
 
@@ -62,7 +77,8 @@ class NorthAngleProvider implements IActivityStateSensitive {
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                 mMagAxisValues = event.values.clone();
-                runNorthAngleCalculations();
+                if (mAccAxisValues != null)
+                    runNorthAngleCalculations();
             }
         }
 
@@ -81,7 +97,7 @@ class NorthAngleProvider implements IActivityStateSensitive {
         northAngleCalculationObservable.subscribe(northAngleSubscriber);
     }
 
-    private float northAngleCalculation(float[] accAxisValues, float[] magAxisValues) {
+    private float northAngleCalculation(float[] accAxisValues, float[] magAxisValues) throws NorthAngleCalculationException {
         float rotationMatrix[] = new float[9];
         float inclinationMatrix[] = new float[9];
         float orientationVector[] = new float[3];
@@ -93,11 +109,11 @@ class NorthAngleProvider implements IActivityStateSensitive {
             float rawNorthAngle = (float) Math.toDegrees((double) orientationVector[0]);
             return getFilteredValue(mNorthAngle, rawNorthAngle);
         } else
-            return 0;
+            throw new NorthAngleCalculationException("To strong magnetic field!");
     }
 
     private float getFilteredValue(float oldValue, float newValue) {
-        float bias = 0.7f;
+        float bias = 0.3f;
         float diff = newValue - oldValue;
         diff = ensureDegreeFormat(diff);
         oldValue += bias * diff;

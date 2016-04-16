@@ -10,13 +10,18 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.greenrobot.eventbus.EventBus;
+
+import slosar.example.compassapp.Events.ExceptionEvent;
+import slosar.example.compassapp.Exceptions.GooglePlayNotAvailableException;
+
 /**
  * Created by Rafal on 2016-04-15.
  */
 public class GoogleApiManager implements IGoogleApiManager {
 
     // Location updates intervals in sec
-    private static int UPDATE_INTERVAL = 200; // 0.2 sec
+    private static int UPDATE_INTERVAL = 100; // 0.1 sec
     private static int FATEST_INTERVAL = 100; // 0.1 sec
     private static int DISPLACEMENT = 0; // 0 meters
 
@@ -44,11 +49,13 @@ public class GoogleApiManager implements IGoogleApiManager {
 
     public GoogleApiManager(Context context) {
         mContext = context;
-
-        if (checkPlayServices()) {
-            mGoogleApiClient = buildGoogleApiClient();
-            mLocationRequest = createLocationRequest();
+        try {
+            checkPlayServices();
+        } catch (GooglePlayNotAvailableException e) {
+            e.printStackTrace();
         }
+        mGoogleApiClient = buildGoogleApiClient();
+        mLocationRequest = createLocationRequest();
     }
 
     @Override
@@ -65,7 +72,12 @@ public class GoogleApiManager implements IGoogleApiManager {
 
     @Override
     public void resume() {
-        checkPlayServices();
+        try {
+            checkPlayServices();
+        } catch (GooglePlayNotAvailableException e) {
+            e.printStackTrace();
+            EventBus.getDefault().postSticky(new ExceptionEvent(e));
+        }
 
         if (mGoogleApiClient.isConnected()) {
             startLocationUpdates();
@@ -84,11 +96,14 @@ public class GoogleApiManager implements IGoogleApiManager {
         }
     }
 
-    private boolean checkPlayServices() {
+    private boolean checkPlayServices() throws GooglePlayNotAvailableException {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(mContext);
 
-        return resultCode == ConnectionResult.SUCCESS;
+        if (resultCode != ConnectionResult.SUCCESS)
+            throw new GooglePlayNotAvailableException();
+        else
+            return true;
     }
 
     private GoogleApiClient buildGoogleApiClient() {
