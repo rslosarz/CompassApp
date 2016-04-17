@@ -1,7 +1,7 @@
 package slosar.example.compassapp.CompassDisplay;
 
 /**
- * Created by Rafal on 2016-04-15.
+ * Interface of CompassPresenter - receiver of compass data
  */
 public interface ICompassDataConsumer {
     void onNewNorthData(float northAngleOld, float northAngleNew);

@@ -1,7 +1,7 @@
 package slosar.example.compassapp.CompassDisplay;
 
 /**
- * Created by Rafal on 2016-04-12.
+ * Interface of CompassActivity - View
  */
 interface ICompassView {
     void showCompassAngle(float currentAngle, float newAngle);

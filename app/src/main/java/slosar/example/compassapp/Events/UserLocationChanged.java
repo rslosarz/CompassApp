@@ -3,7 +3,7 @@ package slosar.example.compassapp.Events;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
- * Created by Rafal on 2016-04-15.
+ * EventBus event object - user location
  */
 public class UserLocationChanged {
     private final float mLatitude, mLongitude;

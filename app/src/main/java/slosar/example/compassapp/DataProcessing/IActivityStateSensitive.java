@@ -1,7 +1,7 @@
 package slosar.example.compassapp.DataProcessing;
 
 /**
- * Created by Rafal on 2016-04-15.
+ * Interface of activity state methods
  */
 interface IActivityStateSensitive {
     void start();

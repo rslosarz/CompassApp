@@ -14,7 +14,7 @@ import slosar.example.compassapp.Events.ExceptionEvent;
 import slosar.example.compassapp.Exceptions.NorthAngleCalculationException;
 
 /**
- * Created by Rafal on 2016-04-12.
+ * Direction angle provider - runs sensor services and provides north angle
  */
 class NorthAngleProvider implements IActivityStateSensitive {
 
@@ -93,18 +93,16 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method calling RxJava subscription.
+     * method calling RxJava subscription.
      */
     private void runNorthAngleCalculations() {
         northAngleCalculationObservable.subscribe(northAngleSubscriber);
     }
 
     /**
-     * @param accAxisValues - acceleration axis measurments (X,Y,Z)
-     * @param magAxisValues - magnetometer axis measurments (X,Y,Z)
-     * @return void
-     * @desc method calculating north angle with magnetometer and accelerometer data, avoiding drifts. Gets rotation matrix (assuming that acceleration measures gravity only), and gets 3 angles of orientation.
+     * method calculating north angle with magnetometer and accelerometer data, avoiding drifts. Gets rotation matrix (assuming that acceleration measures gravity only), and gets 3 angles of orientation.
+     * @param accAxisValues - acceleration axis measurements (X,Y,Z)
+     * @param magAxisValues - magnetometer axis measurements (X,Y,Z)
      */
     private float northAngleCalculation(float[] accAxisValues, float[] magAxisValues) throws NorthAngleCalculationException {
         float rotationMatrix[] = new float[9];
@@ -122,10 +120,9 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
+     * filtration method - adds part of diff between old and new value
      * @param oldValue - current value
      * @param newValue - calculated value
-     * @return filtrated value
-     * @desc filtration method - adds part of diff between old and new value
      */
     private float getFilteredValue(float oldValue, float newValue) {
         float bias = 0.3f;
@@ -136,9 +133,9 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
+     * ensures proper degree format from <-180, 180> range
      * @param angle - calculated angle
      * @return value from <-180, 180> range
-     * @desc ensures proper degree format from <-180, 180> range
      */
     private float ensureDegreeFormat(float angle) {
         while (angle >= 180) angle -= 360;
@@ -147,8 +144,7 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnStart method, starts GoogleApiClient
+     * method called when main activity runs OnStart method, starts GoogleApiClient
      */
     @Override
     public void start() {
@@ -156,8 +152,7 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnResume method, starts GoogleApiClient
+     * method called when main activity runs OnResume method, starts GoogleApiClient
      */
     @Override
     public void resume() {
@@ -166,8 +161,7 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnPause method, starts GoogleApiClient
+     * method called when main activity runs OnPause method, starts GoogleApiClient
      */
     @Override
     public void pause() {
@@ -176,8 +170,7 @@ class NorthAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnStop method, starts GoogleApiClient
+     * method called when main activity runs OnStop method, starts GoogleApiClient
      */
     @Override
     public void stop() {

@@ -3,7 +3,7 @@ package slosar.example.compassapp.GoogleApi;
 import com.google.android.gms.location.LocationListener;
 
 /**
- * Created by Rafal on 2016-04-15.
+ * GoogleApiManager interface
  */
 public interface IGoogleApiManager {
     void registerLocationListener(LocationListener locationListener);

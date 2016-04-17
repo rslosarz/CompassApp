@@ -11,7 +11,7 @@ import slosar.example.compassapp.Events.TargetLocationChanged;
 import slosar.example.compassapp.Events.UserLocationChanged;
 
 /**
- * Created by Rafal on 2016-04-12.
+ * Data manager - runs and manages objects provides north angle and direction angle
  */
 public class CompassDataManager implements ICompassDataManager {
 
@@ -44,9 +44,8 @@ public class CompassDataManager implements ICompassDataManager {
     }
 
     /**
+     * EventBus subscribe method - reacts on change of main activity state
      * @param stateChanged - event object
-     * @return void
-     * @desc EventBus subscribe method - reacts on change of main activity state
      */
     @Subscribe
     public void onMainActivityStateChanged(MainActivityStateChanged stateChanged) {
@@ -66,9 +65,8 @@ public class CompassDataManager implements ICompassDataManager {
     }
 
     /**
+     * EventBus subscribe method - reacts on target location changed
      * @param targetLocationChanged - event object
-     * @return void
-     * @desc EventBus subscribe method - reacts on target location changed
      */
     @Subscribe
     public void onTargetLocationChanged(TargetLocationChanged targetLocationChanged) {

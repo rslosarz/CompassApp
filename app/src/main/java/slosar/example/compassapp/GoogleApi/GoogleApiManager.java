@@ -16,12 +16,12 @@ import slosar.example.compassapp.Events.ExceptionEvent;
 import slosar.example.compassapp.Exceptions.GooglePlayNotAvailableException;
 
 /**
- * Created by Rafal on 2016-04-15.
+ * Manager of GoogleApiClient.
  */
 public class GoogleApiManager implements IGoogleApiManager {
 
     private static int UPDATE_INTERVAL = 100; // 0.1 sec
-    private static int FATEST_INTERVAL = 100; // 0.1 sec
+    private static int FASTEST_INTERVAL = 100; // 0.1 sec
     private static int DISPLACEMENT = 0; // 0 meters
 
     private Context mContext;
@@ -48,9 +48,8 @@ public class GoogleApiManager implements IGoogleApiManager {
 
 
     /**
+     * object constructor
      * @param context instance - application context for handling GoogleApiClient
-     * @return GoogleApiManager
-     * @desc object constructor
      */
     public GoogleApiManager(Context context) {
         mContext = context;
@@ -64,9 +63,8 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
+     * registers location listener interface
      * @param locationListener instance
-     * @return void
-     * @desc registers location listener interface
      */
     @Override
     public void registerLocationListener(LocationListener locationListener) {
@@ -74,8 +72,7 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnStart method, starts GoogleApiClient
+     * method called when main activity runs OnStart method, starts GoogleApiClient
      */
     @Override
     public void start() {
@@ -85,8 +82,7 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnResume method, starts location updates
+     * method called when main activity runs OnResume method, starts location updates
      */
     @Override
     public void resume() {
@@ -103,8 +99,7 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnPause method, stops location updates
+     * method called when main activity runs OnPause method, stops location updates
      */
     @Override
     public void pause() {
@@ -112,8 +107,7 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnStop method, disconnects GoogleApiClient
+     * method called when main activity runs OnStop method, disconnects GoogleApiClient
      */
     @Override
     public void stop() {
@@ -123,22 +117,18 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return boolean true if GooglePlayServices availagle, throws exception if not.
-     * @desc cheks if GooglePlayServices are available on device, throws custom exception
+     * checks if GooglePlayServices are available on device, throws custom exception
      */
-    private boolean checkPlayServices() throws GooglePlayNotAvailableException {
+    private void checkPlayServices() throws GooglePlayNotAvailableException {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(mContext);
 
         if (resultCode != ConnectionResult.SUCCESS)
             throw new GooglePlayNotAvailableException();
-        else
-            return true;
     }
 
     /**
-     * @return void
-     * @desc builds GoogleApiClient object. Sets connection callbacs
+     * builds GoogleApiClient object. Sets connection callbacks
      */
     private GoogleApiClient buildGoogleApiClient() {
         return new GoogleApiClient.Builder(mContext)
@@ -148,13 +138,12 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return void
-     * @desc creates LocationRequest object - sets requests intervals and min displacment
+     * creates LocationRequest object - sets requests intervals and min displacement
      */
     private LocationRequest createLocationRequest() {
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
 
@@ -162,16 +151,14 @@ public class GoogleApiManager implements IGoogleApiManager {
     }
 
     /**
-     * @return void
-     * @desc starts location requests from GoogleApiClient;
+     * starts location requests from GoogleApiClient;
      */
     private void startLocationUpdates() {
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
     }
 
     /**
-     * @return void
-     * @desc stops location requests from GoogleApiClient;
+     * stops location requests from GoogleApiClient;
      */
     private void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, mLocationListener);

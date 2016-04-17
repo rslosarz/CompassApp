@@ -10,7 +10,7 @@ import slosar.example.compassapp.GoogleApi.GoogleApiManager;
 import slosar.example.compassapp.GoogleApi.IGoogleApiManager;
 
 /**
- * Created by Rafal on 2016-04-12.
+ * Direction angle provider - runs GPS service and provides bearing from user location to target location
  */
 class DirectionAngleProvider implements IActivityStateSensitive {
 
@@ -38,8 +38,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method calculates bearing from user location to destination location
+     * method calculates bearing from user location to destination location
      */
     private void calculateBearing() {
         if (mDestinationLocation != null) {
@@ -52,9 +51,8 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
+     * method used by CompassDataManager for setting new destinationLocation coordinates
      * @param targetLocation - LatLng object of given destination location
-     * @return void
-     * @desc method used by CompassDataManager for setting new destinationLocation coordinates
      */
     public void setNewCoordinates(LatLng targetLocation) {
         if (mDestinationLocation == null) {
@@ -66,10 +64,9 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
+     * filtration method - adds part of diff between old and new value
      * @param oldValue - current value
      * @param newValue - calculated value
-     * @return filtrated value
-     * @desc filtration method - adds part of diff between old and new value
      */
     private float getFilteredValue(float oldValue, float newValue) {
         float bias = 0.8f;
@@ -80,9 +77,9 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
+     * ensures proper degree format from <-180, 180> range
      * @param angle - calculated angle
      * @return value from <-180, 180> range
-     * @desc ensures proper degree format from <-180, 180> range
      */
     private float ensureDegreeFormat(float angle) {
         while (angle >= 180) angle -= 360;
@@ -92,8 +89,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
 
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnStart method, starts GoogleApiClient
+     * method called when main activity runs OnStart method, starts GoogleApiClient
      */
     @Override
     public void start() {
@@ -101,8 +97,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnResume method, starts location updates
+     * method called when main activity runs OnResume method, starts location updates
      */
     @Override
     public void resume() {
@@ -112,8 +107,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnPause method, stops location updates
+     * method called when main activity runs OnPause method, stops location updates
      */
     @Override
     public void pause() {
@@ -121,8 +115,7 @@ class DirectionAngleProvider implements IActivityStateSensitive {
     }
 
     /**
-     * @return void
-     * @desc method called when main activity runs OnStop method, stops location updates
+     * method called when main activity runs OnStop method, stops location updates
      */
     @Override
     public void stop() {

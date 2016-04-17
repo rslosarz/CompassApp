@@ -24,6 +24,9 @@ import slosar.example.compassapp.Events.UserLocationChanged;
 import slosar.example.compassapp.Exceptions.UserLocationUnavailableException;
 import slosar.example.compassapp.R;
 
+/**
+ * LocationInputActivity - interface of target location
+ */
 public class LocationInputActivity extends FragmentActivity {
 
     @Bind(R.id.tv_latitude)
@@ -75,8 +78,7 @@ public class LocationInputActivity extends FragmentActivity {
     }
 
     /**
-     * @return void
-     * @desc Button set coordinate OnClickListener. Runs LocationInputActivity
+     * Button set coordinate OnClickListener. Runs LocationInputActivity
      */
     @OnClick(R.id.bt_set_coordinate)
     public void onBtSetCoordinatesClick() {
@@ -85,9 +87,8 @@ public class LocationInputActivity extends FragmentActivity {
     }
 
     /**
+     * EventBus subscribe method for UserLocationChanged events. Updates user location on map.
      * @param userLocationChanged - exception event object
-     * @return void
-     * @desc EventBus subscribe method for UserLocationChanged events. Updates user location on map.
      */
     @Subscribe
     public void onUserLocationChanged(UserLocationChanged userLocationChanged) {
@@ -98,9 +99,8 @@ public class LocationInputActivity extends FragmentActivity {
     }
 
     /**
+     * displays and stores latitude and longitude of matched point on map
      * @param latLng - matched point on map
-     * @return void
-     * @desc displays and stores latitude and longitude of matched point on map
      */
     private void onMapClickHandler(LatLng latLng) {
         selected = latLng;

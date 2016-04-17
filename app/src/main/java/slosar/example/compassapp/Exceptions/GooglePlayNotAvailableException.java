@@ -1,7 +1,7 @@
 package slosar.example.compassapp.Exceptions;
 
 /**
- * Created by Rafal on 2016-04-16.
+ * Exception - Device do not support GooglePlayServices
  */
 public class GooglePlayNotAvailableException extends Exception {
 }

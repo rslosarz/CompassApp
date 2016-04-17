@@ -26,7 +26,12 @@ import slosar.example.compassapp.Exceptions.NorthAngleCalculationException;
 import slosar.example.compassapp.Exceptions.UserLocationUnavailableException;
 import slosar.example.compassapp.R;
 
+/**
+ * CompassActivity - main activity
+ */
 public class CompassActivity extends AppCompatActivity implements ICompassView {
+
+    private static final String ACTUAL_DIRECTION_ANGLE_TAG = "actual_direction_angle";
 
     @Bind(R.id.iv_compass)
     ImageView mIvCompass;
@@ -72,9 +77,20 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getStop()));
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putFloat(ACTUAL_DIRECTION_ANGLE_TAG, mActualDirectionAngle);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mActualDirectionAngle = savedInstanceState.getFloat(ACTUAL_DIRECTION_ANGLE_TAG);
+    }
+
     /**
-     * @return void
-     * @desc Button set coordinate OnClickListener. Runs LocationInputActivity
+     * Button set coordinate OnClickListener. Runs LocationInputActivity
      */
     @OnClick(R.id.bt_set_coordinate)
     public void setNewLatitude() {
@@ -83,9 +99,8 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
+     * runs North Angle rotation animation. Rotates compass background and arrow.
      * @param currentAngle, newAngle - animation start and stop angle
-     * @return void
-     * @desc runs North Angle rotation animation. Rotates compass background and arrow.
      */
     @Override
     public void showCompassAngle(float currentAngle, float newAngle) {
@@ -94,10 +109,9 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
+     * runs Direction Angle rotation animation. Rotates arrow, and stores current angle.
      * @param currentAngle - animation start angle
      * @param newAngle     - animation end angle
-     * @return void
-     * @desc runs Direction Angle rotation animation. Rotates arrow, and stores current angle.
      */
     @Override
     public void showDirectionAngle(float currentAngle, float newAngle) {
@@ -106,8 +120,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
-     * @desc checks if required services are available.
-     * @return void
+     * checks if required services are available.
      */
     private void checkSystemServices() {
         if (!gpsLocationEnabled()) {
@@ -116,7 +129,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
-     * @desc checks if location or network services are turned on.
+     * checks if location or network services are turned on.
      * @return boolean - if one of required services is turned on.
      */
     private boolean gpsLocationEnabled() {
@@ -130,8 +143,7 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
-     * @desc shows alert dialog - no GPS service available. Can redirect to settings menu.
-     * @return void
+     * shows alert dialog - no GPS service available. Can redirect to settings menu.
      */
     private void showGpsSettingsDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -156,10 +168,9 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
-     * @desc returns RotateAnimation object.
+     * returns RotateAnimation object.
      * @param beginAngle - animation start angle
      * @param endAngle   - animation end angle
-     * @return void
      */
     private RotateAnimation getRotationObject(float beginAngle, float endAngle) {
         RotateAnimation rotateAnimation = new RotateAnimation(
@@ -175,19 +186,17 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
     }
 
     /**
-     * @desc EventBus subscribe method for exception events.
+     * EventBus subscribe method for exception events.
      * @param exceptionEvent - exception event object, stores exception
-     * @return void
      */
     @Subscribe
-    public void onExceptionOccured(ExceptionEvent exceptionEvent) {
+    public void onException(ExceptionEvent exceptionEvent) {
         handleException(exceptionEvent.e);
     }
 
     /**
-     * @desc exception handle method - displays toast
+     * exception handle method - displays toast
      * @param e - exception
-     * @return void
      */
     private void handleException(Exception e) {
         if (e instanceof NorthAngleCalculationException) {
