@@ -1,4 +1,4 @@
-package slosar.example.compassapp.DestinationInput;
+package slosar.example.compassapp.Events;
 
 import com.google.android.gms.maps.model.LatLng;
 

@@ -92,10 +92,20 @@ class NorthAngleProvider implements IActivityStateSensitive {
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     }
 
+    /**
+     * @return void
+     * @desc method calling RxJava subscription.
+     */
     private void runNorthAngleCalculations() {
         northAngleCalculationObservable.subscribe(northAngleSubscriber);
     }
 
+    /**
+     * @param accAxisValues - acceleration axis measurments (X,Y,Z)
+     * @param magAxisValues - magnetometer axis measurments (X,Y,Z)
+     * @return void
+     * @desc method calculating north angle with magnetometer and accelerometer data, avoiding drifts. Gets rotation matrix (assuming that acceleration measures gravity only), and gets 3 angles of orientation.
+     */
     private float northAngleCalculation(float[] accAxisValues, float[] magAxisValues) throws NorthAngleCalculationException {
         float rotationMatrix[] = new float[9];
         float inclinationMatrix[] = new float[9];
@@ -111,6 +121,12 @@ class NorthAngleProvider implements IActivityStateSensitive {
             throw new NorthAngleCalculationException("To strong magnetic field!");
     }
 
+    /**
+     * @param oldValue - current value
+     * @param newValue - calculated value
+     * @return filtrated value
+     * @desc filtration method - adds part of diff between old and new value
+     */
     private float getFilteredValue(float oldValue, float newValue) {
         float bias = 0.3f;
         float diff = newValue - oldValue;
@@ -119,29 +135,50 @@ class NorthAngleProvider implements IActivityStateSensitive {
         return ensureDegreeFormat(oldValue);
     }
 
+    /**
+     * @param angle - calculated angle
+     * @return value from <-180, 180> range
+     * @desc ensures proper degree format from <-180, 180> range
+     */
     private float ensureDegreeFormat(float angle) {
         while (angle >= 180) angle -= 360;
         while (angle < -180) angle += 360;
         return angle;
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnStart method, starts GoogleApiClient
+     */
     @Override
     public void start() {
 
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnResume method, starts GoogleApiClient
+     */
     @Override
     public void resume() {
         mSensorManager.registerListener(mAccelerometerListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(mMagnetometerListener, mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_UI);
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnPause method, starts GoogleApiClient
+     */
     @Override
     public void pause() {
         mSensorManager.unregisterListener(mAccelerometerListener);
         mSensorManager.unregisterListener(mMagnetometerListener);
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnStop method, starts GoogleApiClient
+     */
     @Override
     public void stop() {
 

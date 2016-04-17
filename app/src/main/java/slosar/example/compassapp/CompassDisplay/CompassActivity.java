@@ -72,30 +72,53 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         EventBus.getDefault().postSticky(new MainActivityStateChanged(MainActivityStateChanged.getStop()));
     }
 
+    /**
+     * @return void
+     * @desc Button set coordinate OnClickListener. Runs LocationInputActivity
+     */
     @OnClick(R.id.bt_set_coordinate)
     public void setNewLatitude() {
         Intent intent = new Intent(this, LocationInputActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * @param currentAngle, newAngle - animation start and stop angle
+     * @return void
+     * @desc runs North Angle rotation animation. Rotates compass background and arrow.
+     */
     @Override
     public void showCompassAngle(float currentAngle, float newAngle) {
         mIvCompass.startAnimation(getRotationObject(currentAngle, newAngle));
         mIvDirection.startAnimation(getRotationObject(currentAngle + mActualDirectionAngle, newAngle + mActualDirectionAngle));
     }
 
+    /**
+     * @param currentAngle - animation start angle
+     * @param newAngle     - animation end angle
+     * @return void
+     * @desc runs Direction Angle rotation animation. Rotates arrow, and stores current angle.
+     */
     @Override
     public void showDirectionAngle(float currentAngle, float newAngle) {
         mIvDirection.startAnimation(getRotationObject(-currentAngle, -newAngle));
         mActualDirectionAngle = -newAngle;
     }
 
+    /**
+     * @desc checks if required services are available.
+     * @return void
+     */
     private void checkSystemServices() {
         if (!gpsLocationEnabled()) {
             showGpsSettingsDialog();
         }
     }
 
+    /**
+     * @desc checks if location or network services are turned on.
+     * @return boolean - if one of required services is turned on.
+     */
     private boolean gpsLocationEnabled() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         boolean gps, network;
@@ -106,6 +129,10 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         return gps || network;
     }
 
+    /**
+     * @desc shows alert dialog - no GPS service available. Can redirect to settings menu.
+     * @return void
+     */
     private void showGpsSettingsDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
@@ -128,6 +155,12 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         alertDialog.show();
     }
 
+    /**
+     * @desc returns RotateAnimation object.
+     * @param beginAngle - animation start angle
+     * @param endAngle   - animation end angle
+     * @return void
+     */
     private RotateAnimation getRotationObject(float beginAngle, float endAngle) {
         RotateAnimation rotateAnimation = new RotateAnimation(
                 -beginAngle,
@@ -141,11 +174,21 @@ public class CompassActivity extends AppCompatActivity implements ICompassView {
         return rotateAnimation;
     }
 
+    /**
+     * @desc EventBus subscribe method for exception events.
+     * @param exceptionEvent - exception event object, stores exception
+     * @return void
+     */
     @Subscribe
     public void onExceptionOccured(ExceptionEvent exceptionEvent) {
         handleException(exceptionEvent.e);
     }
 
+    /**
+     * @desc exception handle method - displays toast
+     * @param e - exception
+     * @return void
+     */
     private void handleException(Exception e) {
         if (e instanceof NorthAngleCalculationException) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();

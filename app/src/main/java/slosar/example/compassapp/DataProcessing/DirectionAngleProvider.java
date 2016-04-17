@@ -37,6 +37,10 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         mGoogleApiManager.registerLocationListener(mLocationListener);
     }
 
+    /**
+     * @return void
+     * @desc method calculates bearing from user location to destination location
+     */
     private void calculateBearing() {
         if (mDestinationLocation != null) {
             float bearing = mCurrentLocation.bearingTo(mDestinationLocation);
@@ -47,6 +51,11 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         }
     }
 
+    /**
+     * @param targetLocation - LatLng object of given destination location
+     * @return void
+     * @desc method used by CompassDataManager for setting new destinationLocation coordinates
+     */
     public void setNewCoordinates(LatLng targetLocation) {
         if (mDestinationLocation == null) {
             mGoogleApiManager.resume();
@@ -56,6 +65,12 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         mDestinationLocation.setLongitude(targetLocation.longitude);
     }
 
+    /**
+     * @param oldValue - current value
+     * @param newValue - calculated value
+     * @return filtrated value
+     * @desc filtration method - adds part of diff between old and new value
+     */
     private float getFilteredValue(float oldValue, float newValue) {
         float bias = 0.8f;
         float diff = newValue - oldValue;
@@ -64,17 +79,31 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         return ensureDegreeFormat(oldValue);
     }
 
+    /**
+     * @param angle - calculated angle
+     * @return value from <-180, 180> range
+     * @desc ensures proper degree format from <-180, 180> range
+     */
     private float ensureDegreeFormat(float angle) {
         while (angle >= 180) angle -= 360;
         while (angle < -180) angle += 360;
         return angle;
     }
 
+
+    /**
+     * @return void
+     * @desc method called when main activity runs OnStart method, starts GoogleApiClient
+     */
     @Override
     public void start() {
         mGoogleApiManager.start();
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnResume method, starts location updates
+     */
     @Override
     public void resume() {
         if (mDestinationLocation != null) {
@@ -82,11 +111,19 @@ class DirectionAngleProvider implements IActivityStateSensitive {
         }
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnPause method, stops location updates
+     */
     @Override
     public void pause() {
         mGoogleApiManager.pause();
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnStop method, stops location updates
+     */
     @Override
     public void stop() {
         mGoogleApiManager.stop();

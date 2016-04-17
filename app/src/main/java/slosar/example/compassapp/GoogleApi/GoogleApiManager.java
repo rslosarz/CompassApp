@@ -47,6 +47,11 @@ public class GoogleApiManager implements IGoogleApiManager {
     };
 
 
+    /**
+     * @param context instance - application context for handling GoogleApiClient
+     * @return GoogleApiManager
+     * @desc object constructor
+     */
     public GoogleApiManager(Context context) {
         mContext = context;
         try {
@@ -58,11 +63,20 @@ public class GoogleApiManager implements IGoogleApiManager {
         mLocationRequest = createLocationRequest();
     }
 
+    /**
+     * @param locationListener instance
+     * @return void
+     * @desc registers location listener interface
+     */
     @Override
     public void registerLocationListener(LocationListener locationListener) {
         mLocationListener = locationListener;
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnStart method, starts GoogleApiClient
+     */
     @Override
     public void start() {
         if (mGoogleApiClient != null) {
@@ -70,6 +84,10 @@ public class GoogleApiManager implements IGoogleApiManager {
         }
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnResume method, starts location updates
+     */
     @Override
     public void resume() {
         try {
@@ -84,11 +102,19 @@ public class GoogleApiManager implements IGoogleApiManager {
         }
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnPause method, stops location updates
+     */
     @Override
     public void pause() {
         stopLocationUpdates();
     }
 
+    /**
+     * @return void
+     * @desc method called when main activity runs OnStop method, disconnects GoogleApiClient
+     */
     @Override
     public void stop() {
         if (mGoogleApiClient.isConnected()) {
@@ -96,6 +122,10 @@ public class GoogleApiManager implements IGoogleApiManager {
         }
     }
 
+    /**
+     * @return boolean true if GooglePlayServices availagle, throws exception if not.
+     * @desc cheks if GooglePlayServices are available on device, throws custom exception
+     */
     private boolean checkPlayServices() throws GooglePlayNotAvailableException {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(mContext);
@@ -106,6 +136,10 @@ public class GoogleApiManager implements IGoogleApiManager {
             return true;
     }
 
+    /**
+     * @return void
+     * @desc builds GoogleApiClient object. Sets connection callbacs
+     */
     private GoogleApiClient buildGoogleApiClient() {
         return new GoogleApiClient.Builder(mContext)
                 .addConnectionCallbacks(mConnectionCallbacks)
@@ -113,6 +147,10 @@ public class GoogleApiManager implements IGoogleApiManager {
                 .addApi(LocationServices.API).build();
     }
 
+    /**
+     * @return void
+     * @desc creates LocationRequest object - sets requests intervals and min displacment
+     */
     private LocationRequest createLocationRequest() {
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL);
@@ -123,10 +161,18 @@ public class GoogleApiManager implements IGoogleApiManager {
         return mLocationRequest;
     }
 
+    /**
+     * @return void
+     * @desc starts location requests from GoogleApiClient;
+     */
     private void startLocationUpdates() {
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, mLocationListener);
     }
 
+    /**
+     * @return void
+     * @desc stops location requests from GoogleApiClient;
+     */
     private void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, mLocationListener);
     }
